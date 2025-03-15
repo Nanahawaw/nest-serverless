@@ -1,0 +1,27 @@
+service: nest-serverless-app # Name of the service
+
+provider:
+  name: aws
+  runtime: nodejs18.x # NodeJS version
+  region: us-east-1 # AWS region
+  memorySize: 512 # Memory size for the lambda function
+  timeout: 10 # Timeout for the lambda function
+  stage: dev # Stage of the service
+  environment:
+    DB_HOST: ${env:DB_HOST}
+    DB_PORT: ${env:DB_PORT}
+    DB_USER: ${env:DB_USER}
+    DB_PASS: ${env:DB_PASS}
+    DB_NAME: ${env:DB_NAME}
+    JWT_SECRET: ${env:JWT_SECRET}
+
+functions:
+  api:
+    handler: dist/main.handler
+    events:
+      - http:
+        path: /
+        method: ANY
+      - http:
+        path: '{proxy+}'
+        method: ANY
