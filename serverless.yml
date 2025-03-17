@@ -6,6 +6,14 @@ provider:
   region: us-east-1 # AWS region
   memorySize: 512 # Memory size for the lambda function
   timeout: 10 # Timeout for the lambda function
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+        - s3:*
+        - lambda:InvokeFunction
+        - cloudformation:DescribeStackResource
+      Resource: '*'
   stage: dev # Stage of the service
   environment:
     DB_HOST: ${env:DB_HOST}
@@ -19,9 +27,9 @@ functions:
   api:
     handler: dist/main.handler
     events:
-      - http:
+      - httpApi:
         path: /
-        method: ANY
-      - http:
-        path: '{proxy+}'
+        method: GET
+      - httpApi:
+        path: /{any+}
         method: ANY

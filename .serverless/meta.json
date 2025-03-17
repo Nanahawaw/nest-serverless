@@ -11,6 +11,18 @@
         "region": "us-east-1",
         "memorySize": 512,
         "timeout": 10,
+        "iamRoleStatements": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "dynamodb:*",
+              "s3:*",
+              "lambda:InvokeFunction",
+              "cloudformation:DescribeStackResource"
+            ],
+            "Resource": "*"
+          }
+        ],
         "stage": "dev",
         "environment": {
           "DB_HOST": "localhost",
@@ -28,13 +40,13 @@
           "events": [
             {
               "path": "/",
-              "method": "ANY",
-              "http": null
+              "method": "GET",
+              "httpApi": null
             },
             {
-              "path": "{proxy+}",
+              "path": "/{any+}",
               "method": "ANY",
-              "http": null
+              "httpApi": null
             }
           ],
           "name": "nest-serverless-app-dev-api"
@@ -47,6 +59,18 @@
       "region": "us-east-1",
       "memorySize": 512,
       "timeout": 10,
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:*",
+            "s3:*",
+            "lambda:InvokeFunction",
+            "cloudformation:DescribeStackResource"
+          ],
+          "Resource": "*"
+        }
+      ],
       "stage": "dev",
       "environment": {
         "DB_HOST": "localhost",
@@ -60,7 +84,7 @@
     },
     "dashboard": {
       "isEnabledForService": false,
-      "requiredAuthentication": true,
+      "requiredAuthentication": false,
       "orgFeaturesInUse": null,
       "orgObservabilityIntegrations": null,
       "serviceAppId": null,
@@ -68,11 +92,10 @@
       "instanceParameters": null
     },
     "error": {
-      "message": "User: arn:aws:iam::992382512047:user/awscli is not authorized to perform: cloudformation:DescribeStackResource on resource: arn:aws:cloudformation:us-east-1:992382512047:stack/nest-serverless-app-dev/* because no identity-based policy allows the cloudformation:DescribeStackResource action",
-      "stack": "ServerlessError2: User: arn:aws:iam::992382512047:user/awscli is not authorized to perform: cloudformation:DescribeStackResource on resource: arn:aws:cloudformation:us-east-1:992382512047:stack/nest-serverless-app-dev/* because no identity-based policy allows the cloudformation:DescribeStackResource action\n    at file:///C:/Users/Nana/.serverless/releases/4.9.0/package/dist/sf-core.js:587:36\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async persistentRequest (file:///C:/Users/Nana/.serverless/releases/4.9.0/package/dist/sf-core.js:586:1958)",
-      "code": "AWS_CLOUD_FORMATION_DESCRIBE_STACK_RESOURCE_ACCESS_DENIED"
+      "message": "Access denied when storing the parameter \"/serverless-framework/deployment/s3-bucket\". Please check your permissions and try again. You have the following options:\n• Ensure you have permission to create SSM and S3 resources.\n• Use the \"provider.deploymentBucket\" field to specify an existing S3 bucket.\n• Manually create the S3 bucket and SSM parameter.\n\nFor more details, please refer to the documentation: https://www.serverless.com/framework/docs/guides/deployment-bucket\n\nOriginal error: User: arn:aws:iam::992382512047:user/awscli is not authorized to perform: ssm:PutParameter on resource: arn:aws:ssm:us-east-1:992382512047:parameter/serverless-framework/deployment/s3-bucket because no identity-based policy allows the ssm:PutParameter action",
+      "code": "DEPLOYMENT_BUCKET_INSUFFICIENT_PERMISSIONS"
     },
-    "serviceRawFile": "service: nest-serverless-app # Name of the service\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x # NodeJS version\r\n  region: us-east-1 # AWS region\r\n  memorySize: 512 # Memory size for the lambda function\r\n  timeout: 10 # Timeout for the lambda function\r\n  stage: dev # Stage of the service\r\n  environment:\r\n    DB_HOST: ${env:DB_HOST}\r\n    DB_PORT: ${env:DB_PORT}\r\n    DB_USER: ${env:DB_USER}\r\n    DB_PASS: ${env:DB_PASS}\r\n    DB_NAME: ${env:DB_NAME}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n\r\nfunctions:\r\n  api:\r\n    handler: dist/main.handler\r\n    events:\r\n      - http:\r\n        path: /\r\n        method: ANY\r\n      - http:\r\n        path: '{proxy+}'\r\n        method: ANY\r\n",
+    "serviceRawFile": "service: nest-serverless-app # Name of the service\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x # NodeJS version\r\n  region: us-east-1 # AWS region\r\n  memorySize: 512 # Memory size for the lambda function\r\n  timeout: 10 # Timeout for the lambda function\r\n  iamRoleStatements:\r\n    - Effect: Allow\r\n      Action:\r\n        - dynamodb:*\r\n        - s3:*\r\n        - lambda:InvokeFunction\r\n        - cloudformation:DescribeStackResource\r\n      Resource: '*'\r\n  stage: dev # Stage of the service\r\n  environment:\r\n    DB_HOST: ${env:DB_HOST}\r\n    DB_PORT: ${env:DB_PORT}\r\n    DB_USER: ${env:DB_USER}\r\n    DB_PASS: ${env:DB_PASS}\r\n    DB_NAME: ${env:DB_NAME}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n\r\nfunctions:\r\n  api:\r\n    handler: dist/main.handler\r\n    events:\r\n      - httpApi:\r\n        path: /\r\n        method: GET\r\n      - httpApi:\r\n        path: /{any+}\r\n        method: ANY\r\n",
     "command": [
       "deploy"
     ],
